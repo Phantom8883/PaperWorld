@@ -64,8 +64,12 @@ WSGI_APPLICATION = 'paperwolds.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'paperworlds_db',  # Название БД (создай через pgAdmin)
+        'USER': 'paperworlds_user',  # Обычно postgres
+        'PASSWORD': 'pFQL1OER231@#$%',  # Пароль, который указал при установке PostgreSQL
+        'HOST': 'localhost',
+        'PORT': '5432',  # Стандартный порт PostgreSQL
     }
 }
 

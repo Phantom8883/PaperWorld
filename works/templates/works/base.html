@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PaperWorlds - Платформа для фанфиков{% endblock %}</title>
+    {# Блок для CSS/JS файлов #}
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {# ============================================ #}
+    {# ШАПКА САЙТА (HEADER) #}
+    {# ============================================ #}
+    <header>
+        <h1>
+            <a href="{% url 'works:work_list' %}">PaperWorlds</a>
+        </h1>
+        <nav>
+            <a href="{% url 'works:work_list' %}">Все произведения</a>
+            {# {% url 'works:work_list' %} - генерирует URL из urls.py #}
+        </nav>
+    </header>
+
+    {# ============================================ #}
+    {# ОСНОВНОЙ КОНТЕНТ (MAIN CONTENT) #}
+    {# ============================================ #}
+    <main>
+        {# Блок content - здесь будет контент каждой страницы #}
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {# ============================================ #}
+    {# ПОДВАЛ САЙТА (FOOTER) #}
+    {# ============================================ #}
+    <footer>
+        <p>&copy; 2025 PaperWorlds. Платформа для фанфиков.</p>
+    </footer>
+</body>
+</html>
+
