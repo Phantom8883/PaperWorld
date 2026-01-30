@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 
@@ -19,8 +20,7 @@ class Work(models.Model):
 
 
     title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250)
-
+    slug = models.SlugField(max_length=250, unique_for_date='publish', unique=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE, # при удалении пользователя, удаляются все фанфики (объекты привязанные к пользователю)
@@ -29,16 +29,14 @@ class Work(models.Model):
 
     description = models.CharField(max_length=800) # краткое описание фанфика (аннотация)
     # Изменил модель поля на CharField, чтобы у поля были ограничения (было TextField - у него нету ограничений) 
-
+    publish = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     status = models.CharField(
         max_length=2, # Длина кода статуса в Status - "DF" "PB" "CM" в БД сохраняется по два символа
         choices=Status.choices,
         default=Status.DRAFT
     )
-
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
     objects = models.Manager()  # Менеджер по умолчанию
     published = PublishedManager()  # Менеджер для опубликованных работ
 
@@ -55,5 +53,10 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse(
             'works:work_detail', 
-            args=[self.id]
+            args=[
+                self.publish.year,
+                self.publish.month,
+                self.publish.day,
+                self.slug
+                ]
             )

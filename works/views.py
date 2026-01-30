@@ -1,17 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Work
+from .forms import WorkForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.text import slugify
+from django.contrib.auth.decorators import login_required
 
 def work_list(request):
-
     works = Work.published.all()
-
-
-    # Пагинация
-    # Для фанфиков думаю можно 8 работ на страницу сделать, или больше, но думаю 8 хватит пока
     paginator = Paginator(works, 8)
     page_number = request.GET.get('page', 1)
-
     try:
         works = paginator.page(page_number)
     except PageNotAnInteger:
@@ -32,17 +29,52 @@ def work_list(request):
     )
 
 
-def work_detail(request, work_id):
+def work_detail(request, year, month, day, slug):
     work = get_object_or_404(
         Work,
-        id=work_id,
-        status=Work.Status.PUBLISHED
+        status=Work.Status.PUBLISHED,
+        slug=slug,
+        publish__year=year,
+        publish__month=month,
+        publish__day=day
     )
 
     return render(
         request,
         'works/work/detail.html',
         {
-            'work': work
+            'work': work,
         }
+    )
+
+@login_required
+def work_create(request):
+    if request.method == "POST":
+        form = WorkForm(request.POST)
+        if form.is_valid():
+            work = form.save(commit=False)
+
+            base_slug = slugify(work.title)
+            slug = base_slug
+            counter = 1
+
+            while Work.objects.filter(
+                publish__date=work.publish.date(),
+                slug=slug
+            ).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            work.slug = slug
+            work.save()
+
+            return redirect(work.get_absolute_url())
+        
+    else:
+        form = WorkForm()
+
+    return render(
+        request,
+        'works/work/create.html',
+        {'form': form}
     )
